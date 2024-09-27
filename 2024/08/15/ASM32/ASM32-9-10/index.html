@@ -1,0 +1,341 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>ASM32 9-10 反汇编代码和函数 | Hexo</title><meta name="author" content="Miyabi"><meta name="copyright" content="Miyabi"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="反汇编代码根据CPU指令表找到对应的汇编代码 32位反汇编的默认操作数大小为32，若前面加了66前缀可以减小为16，即把eax改为ax；而如果加67可以前缀可以增大大小，但若本来就为eax则没有作用，反而可能使编译出错 示例 1234567896A 00				push 0E8 7C 00 00 00		call 81A3 00 30 40 00		mov dword ptr[00403000],">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ASM32 9-10 反汇编代码和函数">
+<meta property="og:url" content="http://example.com/2024/08/15/ASM32/ASM32-9-10/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="反汇编代码根据CPU指令表找到对应的汇编代码 32位反汇编的默认操作数大小为32，若前面加了66前缀可以减小为16，即把eax改为ax；而如果加67可以前缀可以增大大小，但若本来就为eax则没有作用，反而可能使编译出错 示例 1234567896A 00				push 0E8 7C 00 00 00		call 81A3 00 30 40 00		mov dword ptr[00403000],">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/avatar.jpg">
+<meta property="article:published_time" content="2024-08-15T15:34:17.000Z">
+<meta property="article:modified_time" content="2024-09-27T09:59:39.817Z">
+<meta property="article:author" content="Miyabi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2024/08/15/ASM32/ASM32-9-10/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.14.0-b3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'ASM32 9-10 反汇编代码和函数',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-09-27 17:59:39'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">41</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Hexo"><span class="site-name">Hexo</span></a></span><div id="menus"><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">ASM32 9-10 反汇编代码和函数</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-08-15T15:34:17.000Z" title="发表于 2024-08-15 23:34:17">2024-08-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-09-27T09:59:39.817Z" title="更新于 2024-09-27 17:59:39">2024-09-27</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="ASM32 9-10 反汇编代码和函数"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="反汇编代码"><a href="#反汇编代码" class="headerlink" title="反汇编代码"></a>反汇编代码</h1><p>根据CPU指令表找到对应的汇编代码</p>
+<p>32位反汇编的默认操作数大小为32，若前面加了66前缀可以减小为16，即把eax改为ax；而如果加67可以前缀可以增大大小，但若本来就为eax则没有作用，反而可能使编译出错</p>
+<p><strong>示例</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">6A 00				push 0</span><br><span class="line">E8 7C 00 00 00		call 81</span><br><span class="line">A3 00 30 40 00		mov dword ptr[00403000],eax</span><br><span class="line">E8 B4 00 00 00		call b9</span><br><span class="line">6A 00				push 0</span><br><span class="line">68 EF 11 40 00		push 0x004011ef</span><br><span class="line">6A 00				push 0</span><br><span class="line">6A 65				push 65</span><br><span class="line">FF 35 00 30 40 00	push dword ptr [00403000]</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p><strong>6A 00 — <code>push 0</code></strong></p>
+<ul>
+<li><code>6A</code> 是 <code>push</code> 指令的操作码，用于将一个字节大小的立即数压入堆栈。</li>
+<li><code>00</code> 是立即数，表示将 <code>0</code> 压入堆栈。</li>
+</ul>
+</li>
+<li><p><strong>E8 7C 00 00 00 — <code>call 81</code></strong></p>
+<ul>
+<li><code>E8</code> 是 <code>call</code> 指令的操作码，用于调用一个相对的函数地址，地址是相对当前指令指针（EIP）的偏移。</li>
+<li><code>7C 00 00 00</code> 表示调用的偏移量是 <code>0x7C</code>，即跳转到当前指令后的 <code>0x7C</code> 字节处。</li>
+</ul>
+</li>
+<li><p><strong>A3 00 30 40 00 — <code>mov dword ptr [00403000], eax</code></strong></p>
+<ul>
+<li><code>A3</code> 是 <code>mov</code> 指令的操作码，用于将 <code>eax</code> 寄存器中的值移动到内存中。</li>
+<li><code>00 30 40 00</code> 是目标内存地址，表示将 <code>eax</code> 的值存储到 <code>0x00403000</code> 处。</li>
+</ul>
+</li>
+<li><p><strong>E8 B4 00 00 00 — <code>call b9</code></strong></p>
+<ul>
+<li><code>E8</code> 是 <code>call</code> 指令的操作码，用于调用相对偏移的函数。</li>
+<li><code>B4 00 00 00</code> 表示调用的偏移量是 <code>0xB4</code>，即跳转到当前指令后的 <code>0xB4</code> 字节处。</li>
+</ul>
+</li>
+<li><p><strong>6A 00 — <code>push 0</code></strong></p>
+<ul>
+<li>同第1行，<code>6A 00</code> 再次将 <code>0</code> 压入堆栈。</li>
+</ul>
+</li>
+<li><p><strong>68 EF 11 40 00 — <code>push 0x004011ef</code></strong></p>
+<ul>
+<li><code>68</code> 是 <code>push</code> 指令的操作码，用于将一个 4 字节的立即数压入堆栈。</li>
+<li><code>EF 11 40 00</code> 是立即数，表示将 <code>0x004011EF</code> 压入堆栈。</li>
+</ul>
+</li>
+<li><p><strong>6A 00 — <code>push 0</code></strong></p>
+<ul>
+<li>再次将 <code>0</code> 压入堆栈（与前面的 <code>push 0</code> 相同）。</li>
+</ul>
+</li>
+<li><p><strong>6A 65 — <code>push 65</code></strong></p>
+<ul>
+<li><code>6A</code> 是 <code>push</code> 指令，用于将一个字节大小的立即数压入堆栈。</li>
+<li><code>65</code> 是立即数，表示将 <code>0x65</code>（十进制的 101）压入堆栈。</li>
+</ul>
+</li>
+<li><p><strong>FF 35 00 30 40 00 — <code>push dword ptr [00403000]</code></strong></p>
+<ul>
+<li><code>FF 35</code> 是 <code>push</code> 指令的操作码，用于将存储在内存地址中的 4 字节的值压入堆栈。</li>
+<li><code>00 30 40 00</code> 是内存地址，表示将 <code>0x00403000</code> 地址中的值压入堆栈。</li>
+</ul>
+</li>
+</ol>
+<h1 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h1><p>新建空白工程</p>
+<p><img src="/../../img/image-20240926223941290.png" alt="image-20240926223941290"></p>
+<h2 id="函数实例"><a href="#函数实例" class="headerlink" title="函数实例"></a>函数实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">.386</span><br><span class="line">.model flat,stdcall</span><br><span class="line">option casemap:none</span><br><span class="line"></span><br><span class="line">include windows.inc</span><br><span class="line">include user32.inc</span><br><span class="line">include kernel32.inc</span><br><span class="line"></span><br><span class="line">includelib user32.lib</span><br><span class="line">includelib kernel32.lib</span><br><span class="line"></span><br><span class="line">.const</span><br><span class="line"></span><br><span class="line">.data</span><br><span class="line">;AREA ORG 260 它的作用可以是为了将来的数据定义预留的注释。</span><br><span class="line"></span><br><span class="line">.code</span><br><span class="line"></span><br><span class="line">MyAdd:</span><br><span class="line">	push ebp</span><br><span class="line">	mov ebp,esp</span><br><span class="line">	sub esp,16</span><br><span class="line">	</span><br><span class="line">	push ebx</span><br><span class="line">	</span><br><span class="line">	;ENTER 16,0</span><br><span class="line">	mov eax,dword ptr [ebp+8]</span><br><span class="line">	mov [ebp-4],eax</span><br><span class="line">	mov eax,dword ptr [ebp+12]</span><br><span class="line">	mov [ebp-8],eax</span><br><span class="line"></span><br><span class="line">	pop ebx</span><br><span class="line">	leave</span><br><span class="line">	;mov esp,ebp</span><br><span class="line">	;pop ebp</span><br><span class="line">	retn 8</span><br><span class="line">START:</span><br><span class="line">	push eax</span><br><span class="line">	mov ebp,esp</span><br><span class="line">	</span><br><span class="line">	;函数 栈</span><br><span class="line">	push 2</span><br><span class="line">	push 1</span><br><span class="line">	call MyAdd	;平衡栈</span><br><span class="line">	;add esp,8	c调用约定是为了printf等参数不确定的函数</span><br><span class="line">	</span><br><span class="line">	pop eax</span><br><span class="line">	invoke ExitProcess,0</span><br><span class="line">	ret</span><br><span class="line">end START</span><br></pre></td></tr></table></figure>
+
+<h2 id="文件头部和常量定义"><a href="#文件头部和常量定义" class="headerlink" title="文件头部和常量定义"></a>文件头部和常量定义</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.386</span><br><span class="line">.model flat,stdcall</span><br><span class="line">option casemap:none</span><br></pre></td></tr></table></figure>
+<ul>
+<li>**<code>.386</code>**：指示编译器生成适用于 80386 或更高版本 CPU 的代码。</li>
+<li>**<code>.model flat,stdcall</code>**：定义了内存模型为平坦模式（<code>flat</code>），使用 <code>stdcall</code> 调用约定（用于 Windows API 调用）。</li>
+<li>**<code>option casemap:none</code>**：禁用大小写自动转换，汇编器将区分大小写。</li>
+</ul>
+<h2 id="包含-Windows-相关库"><a href="#包含-Windows-相关库" class="headerlink" title="包含 Windows 相关库"></a>包含 Windows 相关库</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">include windows.inc</span><br><span class="line">include user32.inc</span><br><span class="line">include kernel32.inc</span><br><span class="line">includelib user32.lib</span><br><span class="line">includelib kernel32.lib</span><br></pre></td></tr></table></figure>
+<ul>
+<li>**<code>include</code>**：引入 Windows API 所需的头文件和声明。</li>
+<li>**<code>includelib</code>**：指定链接的库文件，<code>user32.lib</code> 和 <code>kernel32.lib</code> 分别包含常用的 Windows API 函数。</li>
+</ul>
+<h2 id="MyAdd-函数"><a href="#MyAdd-函数" class="headerlink" title="MyAdd 函数"></a><code>MyAdd</code> 函数</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MyAdd:</span><br><span class="line">	push ebp</span><br><span class="line">	mov ebp,esp</span><br><span class="line">	sub esp,16</span><br><span class="line">	push ebx</span><br></pre></td></tr></table></figure>
+<ul>
+<li>**<code>push ebp</code>**：将当前的基指针 (<code>ebp</code>) 压入栈中，保存上一次的栈帧。</li>
+<li>**<code>mov ebp,esp</code>**：将当前栈指针 (<code>esp</code>) 赋值给基指针 (<code>ebp</code>)，建立新的栈帧。</li>
+<li>**<code>sub esp,16</code>**：在栈上为局部变量分配 16 字节空间。</li>
+<li>**<code>push ebx</code>**：将 <code>ebx</code> 寄存器的值压入栈，保护其值不被修改。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov eax,dword ptr [ebp+8]</span><br><span class="line">mov [ebp-4],eax</span><br><span class="line">mov eax,dword ptr [ebp+12]</span><br><span class="line">mov [ebp-8],eax</span><br></pre></td></tr></table></figure>
+<ul>
+<li>**<code>mov eax,dword ptr [ebp+8]</code>**：从栈中获取第一个函数参数并存入 <code>eax</code> 寄存器。</li>
+<li>**<code>mov [ebp-4],eax</code>**：将第一个参数存储到栈中的局部变量位置。</li>
+<li>**<code>mov eax,dword ptr [ebp+12]</code>**：从栈中获取第二个函数参数并存入 <code>eax</code>。</li>
+<li>**<code>mov [ebp-8],eax</code>**：将第二个参数存储到栈中的局部变量位置。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pop ebx</span><br><span class="line">leave</span><br><span class="line">retn 8</span><br></pre></td></tr></table></figure>
+<ul>
+<li>**<code>pop ebx</code>**：恢复之前保存的 <code>ebx</code> 寄存器值。</li>
+<li>**<code>leave</code>**：相当于 <code>mov esp,ebp</code> 和 <code>pop ebp</code>，恢复栈指针和基指针。</li>
+<li>**<code>retn 8</code>**：从函数返回，并在返回时清理 8 字节的栈参数（即两个 <code>DWORD</code> 参数）。</li>
+</ul>
+<h2 id="程序入口-START"><a href="#程序入口-START" class="headerlink" title="程序入口 START"></a>程序入口 <code>START</code></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">START:</span><br><span class="line">	push eax</span><br><span class="line">	mov ebp,esp</span><br></pre></td></tr></table></figure>
+<ul>
+<li>**<code>push eax</code>**：将 <code>eax</code> 压入栈，保存其值。</li>
+<li>**<code>mov ebp,esp</code>**：将当前栈指针复制到基指针，建立栈帧。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">push 2</span><br><span class="line">push 1</span><br><span class="line">call MyAdd</span><br></pre></td></tr></table></figure>
+<ul>
+<li>**<code>push 2</code>**：将值 <code>2</code> 压入栈作为第二个参数。</li>
+<li>**<code>push 1</code>**：将值 <code>1</code> 压入栈作为第一个参数。</li>
+<li>**<code>call MyAdd</code>**：调用 <code>MyAdd</code> 函数。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pop eax</span><br><span class="line">invoke ExitProcess,0</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
+<ul>
+<li>**<code>pop eax</code>**：将栈顶值弹出到 <code>eax</code> 寄存器中。</li>
+<li>**<code>invoke ExitProcess,0</code>**：调用 Windows API 函数 <code>ExitProcess</code> 结束程序，参数为 <code>0</code> 表示正常退出。</li>
+<li>**<code>ret</code>**：返回到调用程序（程序结束）。</li>
+</ul>
+<h2 id="调试结果"><a href="#调试结果" class="headerlink" title="调试结果"></a>调试结果</h2><p><img src="/../../img/image-20240927175552098.png" alt="image-20240927175552098"></p>
+<p>观察堆栈可看到刚开始被压入栈的两个参数1和2在函数调用的过程中被取出作为函数的局部变量</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Miyabi</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2024/08/15/ASM32/ASM32-9-10/">http://example.com/2024/08/15/ASM32/ASM32-9-10/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Hexo</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/08/26/ASM32/ASM32-3/" title="ASM32 3 宏汇编"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">ASM32 3 宏汇编</div></div></a></div><div class="next-post pull-right"><a href="/2024/08/09/ASM32/ASM32-2/" title="ASM32 2 简单的32位汇编程序"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ASM32 2 简单的32位汇编程序</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Miyabi</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">41</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8D%E6%B1%87%E7%BC%96%E4%BB%A3%E7%A0%81"><span class="toc-number">1.</span> <span class="toc-text">反汇编代码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%BD%E6%95%B0"><span class="toc-number">2.</span> <span class="toc-text">函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E5%AE%9E%E4%BE%8B"><span class="toc-number">2.1.</span> <span class="toc-text">函数实例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E5%A4%B4%E9%83%A8%E5%92%8C%E5%B8%B8%E9%87%8F%E5%AE%9A%E4%B9%89"><span class="toc-number">2.2.</span> <span class="toc-text">文件头部和常量定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8C%85%E5%90%AB-Windows-%E7%9B%B8%E5%85%B3%E5%BA%93"><span class="toc-number">2.3.</span> <span class="toc-text">包含 Windows 相关库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MyAdd-%E5%87%BD%E6%95%B0"><span class="toc-number">2.4.</span> <span class="toc-text">MyAdd 函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%85%A5%E5%8F%A3-START"><span class="toc-number">2.5.</span> <span class="toc-text">程序入口 START</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E8%AF%95%E7%BB%93%E6%9E%9C"><span class="toc-number">2.6.</span> <span class="toc-text">调试结果</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/09/23/ASM32/ASM32-7/" title="ASM32 7 DLL注入测试">ASM32 7 DLL注入测试</a><time datetime="2024-09-23T15:11:44.000Z" title="发表于 2024-09-23 23:11:44">2024-09-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/09/06/ASM32/ASM32-6/" title="ASM32 6 RadASM的使用">ASM32 6 RadASM的使用</a><time datetime="2024-09-06T15:45:54.000Z" title="发表于 2024-09-06 23:45:54">2024-09-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/31/ASM32/ASM32-5/" title="ASM32 5 使用C库函数和调用对话框">ASM32 5 使用C库函数和调用对话框</a><time datetime="2024-08-31T15:16:22.000Z" title="发表于 2024-08-31 23:16:22">2024-08-31</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/28/ASM32/ASM32-4/" title="ASM32 4 masm32汇编环境配置和简单代码示例">ASM32 4 masm32汇编环境配置和简单代码示例</a><time datetime="2024-08-28T10:18:09.000Z" title="发表于 2024-08-28 18:18:09">2024-08-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/26/ASM32/ASM32-3/" title="ASM32 3 宏汇编">ASM32 3 宏汇编</a><time datetime="2024-08-26T15:23:18.000Z" title="发表于 2024-08-26 23:23:18">2024-08-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Miyabi</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.14.0-b3"></script><script src="/js/main.js?v=4.14.0-b3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.innerHTML = `<pre class="mermaid-src" hidden>${ele.textContent}</pre>`
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

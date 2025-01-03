@@ -169,8 +169,77 @@
   isHome: true,
   isHighlightShrink: false,
   isToc: false,
-  postUpdate: '2024-12-30 22:56:41'
-}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">53</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Hexo"><span class="site-name">Hexo</span></a></span><div id="menus"><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="site-info"><h1 id="site-title">Hexo</h1></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/12/30/PE/PE3-25/" title="PE3-25 重定位表">PE3-25 重定位表</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-12-30T14:26:31.000Z" title="发表于 2024-12-30 22:26:31">2024-12-30</time></span></div><div class="content">动态链接库的重定位表分析重定位表的作用重定位表用于在程序加载到内存时，修正程序的内存地址。通常，当程序在加载时，它的基地址可能与编译时的预定基地址不同，特别是对于动态链接库（DLL）来说，可能会出现多个程序或库文件冲突的情况。因此，必须修正程序中的地址引用，确保它们指向正确的位置。并不是所有的exe程序都有重定位表，但是DLL却是必须需要重定位信息。 
+  postUpdate: '2025-01-03 22:45:59'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">57</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Hexo"><span class="site-name">Hexo</span></a></span><div id="menus"><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="site-info"><h1 id="site-title">Hexo</h1></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2025/01/03/PE/PE3-31/" title="PE3-31 导入表注入">PE3-31 导入表注入</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-01-03T13:59:06.000Z" title="发表于 2025-01-03 21:59:06">2025-01-03</time></span></div><div class="content">导入表注入在动态链接库一章中提到 DllMain，这里再回顾一次：
+
+当 DLL 被加载进 4GB 空间时，会调用一次 DllMain（入口方法）。
+当程序执行完毕，将 DLL 从 4GB 空间卸载时，也会调用一次 DllMain。
+
+注入的本质是想方设法将自己的 DLL 投放到其他进程的 4GB 空间中。而在前面讲解的导入表一章中提到：
+
+只有隐式调用（静态使用）时，DLL 的名字和相关函数才会出现在调用者 PE 文件的导入表中。
+显式调用（动态使用）时，被调用的 DLL 名和相关函数不会出现在调用者的导入表中。
+
+换句话说：
+
+写入导入表中的 DLL 必定是被隐式调用的（静态使用）。
+如果将毫不相关的 DLL 写入某个 PE 文件的完整导入表中，那么打开这个 PE 文件时，该 DLL 会被直接加载（操作系统的规则）。
+
+导入表注入的原理与过程原理当 .exe 文件被加载时，系统会根据其导入表信息加载需要的 DLL。导入表注入的原理就是修改 .exe 的导入表，将自己的 DLL 添加进去。这样，运行 .exe 时，系统会加载该 DLL 并执行其 DllMain 中的代码，从而实现注入 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2025/01/03/PE/PE3-30/" title="PE3-30 绑定导入表">PE3-30 绑定导入表</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-01-03T13:57:49.000Z" title="发表于 2025-01-03 21:57:49">2025-01-03</time></span></div><div class="content">绑定导入表绑定导入的基本概念在程序加载前，IAT（Import Address Table）和INT（Import Name Table）中的内容通常相同，表示程序引用的 DLL 中函数的名称或序号。加载完成后，IAT 中的内容会被替换为函数的实际地址。
+
+绑定导入的意义
+如果 DLL 文件更新，绑定导入表的时间戳和 DLL 文件的时间戳将不同，此时需要修正函数序号、函数名称和函数地址表。
+加载前直接写绝对地址：在 IAT 表中保存绝对地址，可以加快程序启动速度，因为省去了修复 IAT 表的步骤。
+
+
+优点
+加快程序启动速度：在启动程序时需要申请4gb内存空间、贴exe、贴dll、将IAT表修复为地址等等，如果直接用绝对地址，则省去了修复IAT表的操作；
+
+
+缺点
+DLL 重定位时，如果 DLL 没有占据其自身的 ImageBase 地址，需要修复绝对地址。
+DLL 修改时，IAT 表中的函数地址可能不正确，需要重新修复。
+
+
+
+Windows 提供的一些程序（如记事本）使用了这种绑定导入方式。
+判断绑定导入的方法在导入表的结构中有一个属性：TimeDateStamp，其值可以反映是否 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2025/01/02/PE/PE3-27/" title="PE3-27">PE3-27</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-01-02T13:17:23.000Z" title="发表于 2025-01-02 21:17:23">2025-01-02</time></span></div><div class="content">IAT：Import Address Table 导入地址表间接寻址调用
+调用 DLL 函数时，汇编代码通过 间接寻址 实现，不直接 call 函数地址，而是通过一个中间地址跳转。
+
+示例：调用 MessageBox系统函数（属于 DLL）时，汇编代码为：
+1call dword ptr [004322d4]
+
+
+004322d4 中存储地址 X，程序通过跳转到 X 执行函数。
+004322d4 属于 .exe 的内存区域，而 X 可以指向 DLL 的内存区域（如 77d5050b）。
+
+
+
+为什么需要间接寻址？
+DLL 在加载时可能因重定位占用不同的内存地址。
+因此，调用 DLL 函数不能写死地址，而需要动态更新。
+程序先将 .exe 中某个位置（如 004322d4）写入代码，然后由操作系统在运行时填充实际的函数地址。
+
+文件状态与加载状态的区别
+未运行（文件状态）：
+004322d4 指向的地址仅存储一个字符串，例如 MessageBox.USER32.dll。
+需要根据 RVA（相对虚拟地址）转换为 FOA（文件偏移地址），再减去 ImageBase 才能找到位置。
+
+
+运行中 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2025/01/01/PE/PE3-26/" title="PE3-26 移动导出表-重定位表">PE3-26 移动导出表-重定位表</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-01-01T14:19:01.000Z" title="发表于 2025-01-01 22:19:01">2025-01-01</time></span></div><div class="content">为什么需要移动各种表？
+表的重要性： 这些表由编译器生成，存储了程序运行过程中不可或缺的信息。
+初始化的作用： 系统在程序启动时，会依据这些表完成初始化，例如将使用的 DLL 中函数的地址加载到 IAT 表中。
+保护程序的需求： 为了保护程序，可以对 .exe 的二进制代码进行加密。但问题在于，各种表和用户代码及数据混合在一起。加密后，系统在初始化时会因无法正确解析表信息而出错。
+
+总结：掌握表的移动技巧，是程序加密与反破解的基础。
+移动导出表通常步骤：新增一个节（Section），并将表移动到新节。移动后需要重新计算 ROV。
+具体操作步骤：
+新增节： 在 DLL 中创建一个新的节，记录新增后的 FOA。
+**复制 AddressOfFunctions**： 长度：4 × NumberOfFunctions。
+**复制 AddressOfNameOrdinals**： 长度：2 × NumberOfNames。
+**复制 AddressOfNames**： 长度：4 × NumberOfNames。
+复制函数名字符串： 长度不固定，在复制时直接修复 AddressOfNames。
+复 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/12/30/PE/PE3-25/" title="PE3-25 重定位表">PE3-25 重定位表</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-12-30T14:26:31.000Z" title="发表于 2024-12-30 22:26:31">2024-12-30</time></span></div><div class="content">动态链接库的重定位表分析重定位表的作用重定位表用于在程序加载到内存时，修正程序的内存地址。通常，当程序在加载时，它的基地址可能与编译时的预定基地址不同，特别是对于动态链接库（DLL）来说，可能会出现多个程序或库文件冲突的情况。因此，必须修正程序中的地址引用，确保它们指向正确的位置。并不是所有的exe程序都有重定位表，但是DLL却是必须需要重定位信息。 
 为了提高搜索的速度，模块间地址也是要对齐的。模块地址对齐为10000H，也就是64K（64*1024）。
 为什么DLL文件需要重定位表大多数EXE文件不会使用重定位表，因为它们通常按固定基址（如0x400000）加载，不会和其他程序冲突。但DLL文件由于可能被多个程序同时加载，且加载地址可能不同，因此必须有重定位表来修正各个地方的内存地址，避免内存冲突。
 为什么要用重定位表
@@ -275,52 +344,7 @@
 
 当节 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/10/26/PE/PE3-18/" title="PE3-18 在任意代码空白区添加代码">PE3-18 在任意代码空白区添加代码</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-10-26T03:08:47.000Z" title="发表于 2024-10-26 11:08:47">2024-10-26</time></span></div><div class="content">计算NewBuffer的大小可以通过最后一个节表的信息知道最后一个节表的偏移地址+ImageBase+节的大小，就是NewBuffer的大小
 
-Work参考代码123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134135136137138139140141142143144145146147148149150151152153154155156157158159160161162163164165166167168169170171172173174175176 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/10/24/PE/PE3-17/" title="PE3-17 代码节空白区添加代码">PE3-17 代码节空白区添加代码</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-10-24T14:05:52.000Z" title="发表于 2024-10-24 22:05:52">2024-10-24</time></span></div><div class="content">硬编码：E8 和 E9 指令E8 和 E9 是 call 和 jmp 指令的操作码，后面跟的并不是直接的小端序地址。关键是如何计算跳转的地址。
-call 例子：
-12call 0x77E5425FE8 5F 42 E5 77  (这是错的)
-jmp 例子：
-12jmp 0x2345678E9 2B 2B 00 00
-
-从这个例子可以看出，E8 和 E9 后面的地址不是直接的小端序转换。要理解如何生成这些字节，我们需要用一个公式来计算。
-跳转地址的计算方式真正要跳转的地址 &#x3D; E8 或 E9 指令的下一条指令的地址 + X
-其中：
-
-X &#x3D; 真正要跳转的地址 - E8 或 E9 指令的下一条指令的地址
-
-具体例子12345678func();00A825E1 E8 62 ED FF FF       call        func (0A81348h)  return 0;00A825E6 33 C0                xor         eax,eax  00A825E8 5F                   pop         edi   ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/10/20/PE/PE3-16/" title="PE3_16 FileBuffer-&gt;ImageBuffer">PE3_16 FileBuffer-&gt;ImageBuffer</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-10-20T04:21:58.000Z" title="发表于 2024-10-20 12:21:58">2024-10-20</time></span></div><div class="content">前面提到过，文件从硬盘加载到内存运行时会经过“拉伸”操作，那么在经过简单拉伸之后，程序是否就可以运行呢？答案是否定的。在完成基本拉伸操作后，程序还不能立即运行，还需要进行一些额外的处理。不过此时已经非常接近能够运行了。
-Misc.VirtualSize 和 SizeOfRawData 的大小对比在内存中的节有一个 Misc.VirtualSize 属性，表示在内存中拉伸后的实际大小；而 SizeOfRawData 则表示文件在磁盘上的大小。
-这两者的大小通常不同，因为内存中可能包含一些未初始化的数据，而这些数据不会在文件中实际保存，但在加载到内存时会被计算并为其预留空间。因此，通常情况下，Misc.VirtualSize 会大于 SizeOfRawData。
-总结：
-
-Misc.VirtualSize 是加载到内存中时的实际大小，且它是加载之前未对齐的大小。
-SizeOfRawData 是磁盘文件中已对齐的数据大小。
-
-拷贝文件内容到内存时，应该以两者中较小的数值为准。
-
-如何算出内存中节存储的某个地址在文件中对应的地址举个例子，假设在某个节中有一个内存地址是 0x501234。
-
-首 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/10/18/PE/PE3-13/" title="PE3_13 节表">PE3_13 节表</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-10-18T10:38:13.000Z" title="发表于 2024-10-18 18:38:13">2024-10-18</time></span></div><div class="content">联合体1234union TestUnion &#123;    char x;    int y;&#125;;
-
-特点：
-
-共享空间：联合体的所有成员共享同一内存空间。
-内存大小：联合体的大小由最大成员的大小决定。例如，以上例子中，联合体的大小为4字节（int类型）。
-有效性：联合体中最多只有一个成员是有效的，但仍然可以访问所有成员。
-
-123456789union TestUnion &#123;    char x;    int y;&#125;;union &#123;    char x;    int y;&#125; TestUnion;
-
-节表（Section Table）节表是Windows PE&#x2F;COFF格式可执行文件中的一个重要数据结构，记录了各个代码段、数据段、资源段、重定向表等在文件中的位置和大小信息。操作系统通过节表进行各个段的映射和初始化。
-在执行PE文件时，Windows不会立即将整个文件读入内存，而是由PE装载器建立虚拟地址与PE文件之间的映射关系。只有当执行到某个内存页中的指令或访问页中的数据时，才会将该页面从磁盘加载到内存。这种机制极 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/10/16/PE/PE3-12/" title="PE3_12 PE头字段说明">PE3_12 PE头字段说明</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-10-16T15:11:23.000Z" title="发表于 2024-10-16 23:11:23">2024-10-16</time></span></div><div class="content">文件对齐与内存对齐程序最初存储在硬盘上，运行时需要加载到内存中。在加载过程中，文件的不同部分会进行重新排列和对齐，以便能够正确运行。视频中硬盘的对齐单位为0x200h，而内存中的对齐单位为0x1000h。这种对齐的差异导致文件在加载到内存中时需要进行“拉伸”处理，使文件能够符合内存的对齐要求，从而正确执行。
-
-内核重载与虚拟地址程序一般从0x40000的虚拟地址开始执行，这个地址留给系统，增加了程序的安全性。虚拟地址由操作系统映射到实际的物理地址。
-然后关于为什么程序一般从0x40000开始呢，视频里说是因为留出空间，如果访问这个内存就会报错，因为这是系统的空间，增加代码的安全性。
-内核在加载程序时，会将程序的虚拟地址映射到实际的物理地址。常见的程序起始虚拟地址为0x40000，保留了前面的地址空间用于系统，这样当指针错误时不会访问系统关键区域。
-部分PE结构解析：DOS头
-WORD e_magic: 固定值为“MZ”，标识这是一个可执行文件。
-DWORD e_lfanew: PE头相对于文件起始位置的偏移，用于定位PE头的位置。
-
-标准PE头
-WORD Machine: 表示运行该程 ...</div></div></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span><a class="page-number" href="/page/2/#content-inner">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/#content-inner">6</a><a class="extend next" rel="next" href="/page/2/#content-inner"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Miyabi</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">53</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/12/30/PE/PE3-25/" title="PE3-25 重定位表">PE3-25 重定位表</a><time datetime="2024-12-30T14:26:31.000Z" title="发表于 2024-12-30 22:26:31">2024-12-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/12/29/PE/PE3-24/" title="PE3-24 导出表">PE3-24 导出表</a><time datetime="2024-12-29T15:29:23.000Z" title="发表于 2024-12-29 23:29:23">2024-12-29</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/12/23/PE/PE3-23/" title="PE3-23 静态链接库-动态链接库">PE3-23 静态链接库-动态链接库</a><time datetime="2024-12-23T15:13:31.000Z" title="发表于 2024-12-23 23:13:31">2024-12-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/11/24/PE/PE3-20/" title="PE3-20 扩大节-合并节-数据目录">PE3-20 扩大节-合并节-数据目录</a><time datetime="2024-11-24T15:48:20.000Z" title="发表于 2024-11-24 23:48:20">2024-11-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/11/22/PE/PE3-19/" title="PE3-19 新增节-添加代码">PE3-19 新增节-添加代码</a><time datetime="2024-11-22T11:56:50.000Z" title="发表于 2024-11-22 19:56:50">2024-11-22</time></div></div></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/12/"><span class="card-archive-list-date">十二月 2024</span><span class="card-archive-list-count">3</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/11/"><span class="card-archive-list-date">十一月 2024</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/10/"><span class="card-archive-list-date">十月 2024</span><span class="card-archive-list-count">7</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/09/"><span class="card-archive-list-date">九月 2024</span><span class="card-archive-list-count">3</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/08/"><span class="card-archive-list-date">八月 2024</span><span class="card-archive-list-count">11</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/07/"><span class="card-archive-list-date">七月 2024</span><span class="card-archive-list-count">27</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站资讯</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">文章数目 :</div><div class="item-count">53</div></div><div class="webinfo-item"><div class="item-name">本站访客数 :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">本站总访问量 :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">最后更新时间 :</div><div class="item-count" id="last-push-date" data-lastPushDate="2024-12-30T14:56:41.482Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Miyabi</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.14.0-b3"></script><script src="/js/main.js?v=4.14.0-b3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+Work参考代码123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134135136137138139140141142143144145146147148149150151152153154155156157158159160161162163164165166167168169170171172173174175176 ...</div></div></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span><a class="page-number" href="/page/2/#content-inner">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/#content-inner">6</a><a class="extend next" rel="next" href="/page/2/#content-inner"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Miyabi</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">57</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/03/PE/PE3-31/" title="PE3-31 导入表注入">PE3-31 导入表注入</a><time datetime="2025-01-03T13:59:06.000Z" title="发表于 2025-01-03 21:59:06">2025-01-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/03/PE/PE3-30/" title="PE3-30 绑定导入表">PE3-30 绑定导入表</a><time datetime="2025-01-03T13:57:49.000Z" title="发表于 2025-01-03 21:57:49">2025-01-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/02/PE/PE3-27/" title="PE3-27">PE3-27</a><time datetime="2025-01-02T13:17:23.000Z" title="发表于 2025-01-02 21:17:23">2025-01-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/01/PE/PE3-26/" title="PE3-26 移动导出表-重定位表">PE3-26 移动导出表-重定位表</a><time datetime="2025-01-01T14:19:01.000Z" title="发表于 2025-01-01 22:19:01">2025-01-01</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/12/30/PE/PE3-25/" title="PE3-25 重定位表">PE3-25 重定位表</a><time datetime="2024-12-30T14:26:31.000Z" title="发表于 2024-12-30 22:26:31">2024-12-30</time></div></div></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2025/01/"><span class="card-archive-list-date">一月 2025</span><span class="card-archive-list-count">4</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/12/"><span class="card-archive-list-date">十二月 2024</span><span class="card-archive-list-count">3</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/11/"><span class="card-archive-list-date">十一月 2024</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/10/"><span class="card-archive-list-date">十月 2024</span><span class="card-archive-list-count">7</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/09/"><span class="card-archive-list-date">九月 2024</span><span class="card-archive-list-count">3</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/08/"><span class="card-archive-list-date">八月 2024</span><span class="card-archive-list-count">11</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/07/"><span class="card-archive-list-date">七月 2024</span><span class="card-archive-list-count">27</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站资讯</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">文章数目 :</div><div class="item-count">57</div></div><div class="webinfo-item"><div class="item-name">本站访客数 :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">本站总访问量 :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">最后更新时间 :</div><div class="item-count" id="last-push-date" data-lastPushDate="2025-01-03T14:45:58.757Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By Miyabi</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.14.0-b3"></script><script src="/js/main.js?v=4.14.0-b3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
   const runMermaid = (ele) => {
     window.loadMermaid = true
     const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'

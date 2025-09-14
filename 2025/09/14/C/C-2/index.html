@@ -1,0 +1,393 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>C 2 string容器 | Hexo</title><meta name="author" content="Miyabi"><meta name="copyright" content="Miyabi"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="构造函数string基本概念本质：  string是C++风格的字符串，而string本质上是一个类  string和char*区别：  char*是一个指针 string是一个类，类内部封装了很多成员方法  例如：查找find、拷贝copy、删除delete替换replace、插入insert string管理char*所分配的内存，不用担心复制越界和取值越界等，由类内部进行负责 string构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C 2 string容器">
+<meta property="og:url" content="http://example.com/2025/09/14/C/C-2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="构造函数string基本概念本质：  string是C++风格的字符串，而string本质上是一个类  string和char*区别：  char*是一个指针 string是一个类，类内部封装了很多成员方法  例如：查找find、拷贝copy、删除delete替换replace、插入insert string管理char*所分配的内存，不用担心复制越界和取值越界等，由类内部进行负责 string构">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/avatar.jpg">
+<meta property="article:published_time" content="2025-09-14T15:27:12.000Z">
+<meta property="article:modified_time" content="2025-09-14T15:50:05.603Z">
+<meta property="article:author" content="Miyabi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/avatar.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/09/14/C/C-2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.14.0-b3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>(()=>{
+      const saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+      
+      window.btf = {
+        saveToLocal: saveToLocal,
+        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = url
+          script.async = true
+          script.onerror = reject
+          script.onload = script.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            script.onload = script.onreadystatechange = null
+            resolve()
+          }
+
+          Object.keys(attr).forEach(key => {
+            script.setAttribute(key, attr[key])
+          })
+
+          document.head.appendChild(script)
+        }),
+
+        getCSS: (url, id = false) => new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = url
+          if (id) link.id = id
+          link.onerror = reject
+          link.onload = link.onreadystatechange = function() {
+            const loadState = this.readyState
+            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+            link.onload = link.onreadystatechange = null
+            resolve()
+          }
+          document.head.appendChild(link)
+        }),
+
+        addGlobalFn: (key, fn, name = false, parent = window) => {
+          const pjaxEnable = false
+          if (!pjaxEnable && key.startsWith('pjax')) return
+
+          const globalFn = parent.globalFn || {}
+          const keyObj = globalFn[key] || {}
+    
+          if (name && keyObj[name]) return
+    
+          name = name || Object.keys(keyObj).length
+          keyObj[name] = fn
+          globalFn[key] = keyObj
+          parent.globalFn = globalFn
+        }
+      }
+    
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+      
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })()</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'C 2 string容器',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-09-14 23:50:05'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">83</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Hexo"><span class="site-name">Hexo</span></a></span><div id="menus"><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">C 2 string容器</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-09-14T15:27:12.000Z" title="发表于 2025-09-14 23:27:12">2025-09-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-09-14T15:50:05.603Z" title="更新于 2025-09-14 23:50:05">2025-09-14</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="C 2 string容器"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h1><h2 id="string基本概念"><a href="#string基本概念" class="headerlink" title="string基本概念"></a><strong>string基本概念</strong></h2><p><strong>本质：</strong></p>
+<ul>
+<li>string是C++风格的字符串，而string本质上是一个类</li>
+</ul>
+<p><strong>string和char*区别：</strong></p>
+<ul>
+<li>char*是一个指针</li>
+<li>string是一个类，类内部封装了很多成员方法</li>
+</ul>
+<p>例如：查找find、拷贝copy、删除delete替换replace、插入insert</p>
+<p>string管理char*所分配的内存，不用担心复制越界和取值越界等，由类内部进行负责</p>
+<h2 id="string构造函数"><a href="#string构造函数" class="headerlink" title="string构造函数"></a>string构造函数</h2><p>构造函数原型：</p>
+<ul>
+<li>string();                                 &#x2F;&#x2F;创建一个空的字符串</li>
+</ul>
+<p>​		string(const char* s);        &#x2F;&#x2F;使用字符串s初始化</p>
+<ul>
+<li>string(const string&amp; str);   &#x2F;&#x2F;使用一个string对象初始化另一个string对象</li>
+<li>string(int n,char c);             &#x2F;&#x2F;使用n个字符c初始化</li>
+</ul>
+<p><strong>Demo</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test01</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	string s1;<span class="comment">//创建空字符串,调用无参构造函数</span></span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str1=&quot;</span> &lt;&lt; s1 &lt;&lt; endl;</span><br><span class="line">	<span class="type">const</span> <span class="type">char</span>* str = <span class="string">&quot;hello world&quot;</span>;</span><br><span class="line">	<span class="function">string <span class="title">s2</span><span class="params">(str)</span></span>;<span class="comment">//把c_string转换成了string</span></span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str2=&quot;</span> &lt;&lt; s2 &lt;&lt; endl;</span><br><span class="line">	<span class="function">string <span class="title">s3</span><span class="params">(s2)</span></span>;<span class="comment">//调用拷贝构造函数</span></span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str3 = &quot;</span> &lt;&lt; s3 &lt;&lt; endl;</span><br><span class="line">	<span class="function">string <span class="title">s4</span><span class="params">(<span class="number">10</span>, <span class="string">&#x27;a&#x27;</span>)</span></span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str3 = &quot;</span> &lt;&lt; s3 &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">test01</span>();</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">str1=</span><br><span class="line">str2=hello world</span><br><span class="line">str3 = hello world</span><br><span class="line">str3 = hello world</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结：</strong>string的多种构造方式没有可比性，灵活使用即可</p>
+<h1 id="赋值操作"><a href="#赋值操作" class="headerlink" title="赋值操作"></a>赋值操作</h1><h2 id="string赋值操作"><a href="#string赋值操作" class="headerlink" title="string赋值操作"></a>string赋值操作</h2><p>功能描述：</p>
+<ul>
+<li>给string字符串进行赋值</li>
+</ul>
+<p>赋值的函数原型：</p>
+<ul>
+<li>string&amp; operator&#x3D;(const char* s);      &#x2F;&#x2F;char*类型字符串 赋值给当前的字符串</li>
+<li>string&amp; operator&#x3D;(const string &amp;s);   &#x2F;&#x2F;把字符串s赋给当前的字符串</li>
+<li>string&amp; operator&#x3D;(char c);                   &#x2F;&#x2F;字符赋值给当前的字符串 </li>
+<li>string&amp; assign(const char* s);             &#x2F;&#x2F;把字符串s付给当前的字符串</li>
+<li>string&amp; assign(const char* s,int n);    &#x2F;&#x2F;把字符串s的前n个字符赋给当前的字符串</li>
+<li>string&amp; assign(const string &amp;s);          &#x2F;&#x2F;把字符串s赋给当前字符串</li>
+<li>string&amp; assign(int n,char c);                 &#x2F;&#x2F;用n个字符c赋给当前字符串</li>
+</ul>
+<p><strong>Demo</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="comment">//赋值</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test01</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	string str1;</span><br><span class="line">	str1 = <span class="string">&quot;hello world&quot;</span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str1=&quot;</span> &lt;&lt; str1 &lt;&lt; endl;</span><br><span class="line">	string str2;</span><br><span class="line">	str2 = str1;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str2=&quot;</span> &lt;&lt; str2 &lt;&lt; endl;</span><br><span class="line">	string str3;</span><br><span class="line">	str3 = <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str3=&quot;</span> &lt;&lt; str3 &lt;&lt; endl;</span><br><span class="line">	string str4;</span><br><span class="line">	str4.<span class="built_in">assign</span>(<span class="string">&quot;hello c++&quot;</span>);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str4=&quot;</span> &lt;&lt; str4 &lt;&lt; endl;</span><br><span class="line">	string str5;</span><br><span class="line">	str5.<span class="built_in">assign</span>(<span class="string">&quot;hello c++&quot;</span>, <span class="number">5</span>);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str5=&quot;</span> &lt;&lt; str5 &lt;&lt; endl;</span><br><span class="line">	string str6;</span><br><span class="line">	str6.<span class="built_in">assign</span>(str5);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str6=&quot;</span> &lt;&lt; str6 &lt;&lt; endl;</span><br><span class="line">	string str7;</span><br><span class="line">	str7.<span class="built_in">assign</span>(<span class="number">5</span>,<span class="string">&#x27;x&#x27;</span>);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str7=&quot;</span> &lt;&lt; str7 &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">test01</span>();</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">str1=hello world</span><br><span class="line">str2=hello world</span><br><span class="line">str3=a</span><br><span class="line">str4=hello c++</span><br><span class="line">str5=hello</span><br><span class="line">str6=hello</span><br><span class="line">str7=xxxxx</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结：</strong>string的赋值方式很多，operator&#x3D;这种方式是比较实用的</p>
+<h1 id="字符串拼接"><a href="#字符串拼接" class="headerlink" title="字符串拼接"></a>字符串拼接</h1><h2 id="string字符串拼接"><a href="#string字符串拼接" class="headerlink" title="string字符串拼接"></a>string字符串拼接</h2><p><strong>功能描述：</strong></p>
+<ul>
+<li>实现在字符串末尾拼接字符串</li>
+</ul>
+<p><strong>函数原型：</strong></p>
+<ul>
+<li>string&amp; operator+&#x3D;(const char* str);                 &#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; operator+&#x3D;(const char c);                      &#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; operator+&#x3D;(const string* str);               &#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; append(const char* s);                           &#x2F;&#x2F;把字符串s连接到当前字符串结尾</li>
+<li>string&amp; append(const char* s,int n);                  &#x2F;&#x2F;把字符串s的前n个字符连接到当前字符串结尾</li>
+<li>string&amp; append(const string &amp;s);                        &#x2F;&#x2F;同operator+&#x3D;（const string&amp; str）</li>
+<li>string&amp; append(const string &amp;s,int pos,int n);  &#x2F;&#x2F;字符串s中从pos开始的n个字符连接到字符串结尾</li>
+</ul>
+<p><strong>Demo</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="comment">//字符串拼接</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test01</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	string str1 = <span class="string">&quot;我&quot;</span>;</span><br><span class="line">	str1 += <span class="string">&quot;爱玩游戏&quot;</span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str1=&quot;</span> &lt;&lt; str1 &lt;&lt; endl;</span><br><span class="line">	str1 += <span class="string">&#x27;:&#x27;</span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str1=&quot;</span> &lt;&lt; str1 &lt;&lt; endl;</span><br><span class="line">	string str2 = <span class="string">&quot;LOL DNF&quot;</span>;</span><br><span class="line">	str1 += str2;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str1=&quot;</span> &lt;&lt; str1 &lt;&lt; endl;</span><br><span class="line">	string str3 = <span class="string">&quot;I&quot;</span>;</span><br><span class="line">	str3.<span class="built_in">append</span>(<span class="string">&quot; love &quot;</span>);</span><br><span class="line">	str3.<span class="built_in">append</span>(<span class="string">&quot;game abcde&quot;</span>, <span class="number">4</span>);</span><br><span class="line">	<span class="comment">//str3.append(str2);</span></span><br><span class="line">	str3.<span class="built_in">append</span>(str2, <span class="number">4</span>, <span class="number">3</span>);<span class="comment">//从下标4位置开始，截取3个字符，拼接到字符串末尾</span></span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str3=&quot;</span> &lt;&lt; str3 &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">test01</span>();</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">str1=我爱玩游戏</span><br><span class="line">str1=我爱玩游戏:</span><br><span class="line">str1=我爱玩游戏:LOL DNF</span><br><span class="line">str3=I love gameDNF</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结：</strong>字符串拼接的重载版本很多，初学阶段记住几种即可</p>
+<h1 id="字符串查找和替换"><a href="#字符串查找和替换" class="headerlink" title="字符串查找和替换"></a>字符串查找和替换</h1><h2 id="String查找和替换"><a href="#String查找和替换" class="headerlink" title="String查找和替换"></a>String查找和替换</h2><p><strong>功能描述：</strong></p>
+<ul>
+<li>查找：查找指定字符串是否存在</li>
+<li>替换：在指定的位置替换字符串</li>
+</ul>
+<p><strong>函数原型：</strong></p>
+<ul>
+<li>int find(const string&amp; str,int pos&#x3D;0) const;        &#x2F;&#x2F;查找str第一次出现位置，从pos开始查找</li>
+<li>int find(const char* s,int pos&#x3D;0) const;              &#x2F;&#x2F;查找s第一次出现位置，从pos开始查找</li>
+<li>int find(const char* s,int pos,int n) const;         &#x2F;&#x2F;从pos位置查找s的前n个字符第一个位置</li>
+<li>int find(const char c,int pos&#x3D;0) const;                &#x2F;&#x2F;查找字符c第一次出现位置</li>
+<li>int rfind(const string&amp; str,int pos&#x3D;npos) const;&#x2F;&#x2F;查找str最后一次出现位置，从npos开始查找</li>
+<li>int rfind(const char* s,int pos&#x3D;npos) const;      &#x2F;&#x2F;查找s最后一次出现位置，从npos开始查找</li>
+<li>int rfind(const char* s,int pos,int n) const;        &#x2F;&#x2F;从pos位置查找s的前n个字符最后一个位置</li>
+<li>int rfind(const char c,int pos&#x3D;0) const;               &#x2F;&#x2F;查找字符c最后一次出现位置</li>
+<li>string&amp; replace(int pos,int n,const string&amp; str);&#x2F;&#x2F;替换从pos开始n个字符为字符串str</li>
+<li>string&amp; replace(int pos,int n,const char* str);   &#x2F;&#x2F;替换从pos开始的n个字符为字符串s</li>
+</ul>
+<p><strong>Demo</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test01</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//查找</span></span><br><span class="line">	string str1 = <span class="string">&quot;abcdefgde&quot;</span>;</span><br><span class="line">	<span class="type">int</span> pos = str1.<span class="built_in">find</span>(<span class="string">&quot;de&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (pos == <span class="number">-1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;未找到&quot;</span> &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;pos=&quot;</span> &lt;&lt; pos &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	pos = str1.<span class="built_in">rfind</span>(<span class="string">&quot;de&quot;</span>);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;pos=&quot;</span> &lt;&lt; pos &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test02</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//替换</span></span><br><span class="line">	string str1 = <span class="string">&quot;abcdefgde&quot;</span>;</span><br><span class="line">	str1.<span class="built_in">replace</span>(<span class="number">1</span>, <span class="number">3</span>, <span class="string">&quot;1111&quot;</span>);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;str1=&quot;</span> &lt;&lt; str1 &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">test01</span>();</span><br><span class="line">	<span class="built_in">test02</span>();</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pos=<span class="number">3</span></span><br><span class="line">pos=<span class="number">7</span></span><br><span class="line">str1=a1111efgde</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结：</strong></p>
+<ul>
+<li>find查找是从左往右，rfind从右往左</li>
+<li>find找到字符串后返回查找的第一个位置，找不到返回-1</li>
+<li>replace在替换时，要指定从哪个位置起，多少个字符，替换成什么样的字符串</li>
+</ul>
+<h1 id="字符串比较"><a href="#字符串比较" class="headerlink" title="字符串比较"></a>字符串比较</h1><h2 id="string字符串比较"><a href="#string字符串比较" class="headerlink" title="string字符串比较"></a>string字符串比较</h2><p>功能描述：</p>
+<ul>
+<li>字符串之间的比较</li>
+</ul>
+<p>比较方式：</p>
+<ul>
+<li>字符串比较是按字符的ASCII码进行对比</li>
+</ul>
+<p>等于 返回0</p>
+<p>大于 返回 1</p>
+<p>小于 返回 -1</p>
+<p><strong>函数原型：</strong></p>
+<ul>
+<li>int compare(const string &amp;s) const; &#x2F;&#x2F;与字符串s比较</li>
+<li>int compare(const char *s)const;     &#x2F;&#x2F;与字符串s比较</li>
+</ul>
+<p><strong>Demo</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="comment">//字符串比较</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test01</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	string s1 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">	string s2 = <span class="string">&quot;aello&quot;</span>;</span><br><span class="line">	<span class="type">int</span> ret = s1.<span class="built_in">compare</span>(s2);</span><br><span class="line">	<span class="keyword">if</span> (ret == <span class="number">0</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;s1等于s2&quot;</span> &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (ret &gt; <span class="number">0</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;s1大于s2&quot;</span> &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;s1大于s2&quot;</span> &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">test01</span>();</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s1大于s2</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结：</strong>字符串对比主要是用于比较两个字符串是否相等，判断谁大谁小的意义并不是很大</p>
+<h1 id="字符存取"><a href="#字符存取" class="headerlink" title="字符存取"></a>字符存取</h1><h2 id="string字符存取"><a href="#string字符存取" class="headerlink" title="string字符存取"></a>string字符存取</h2><p>string中单个字符存取方式有两种</p>
+<ul>
+<li>char&amp; operator[](int n);&#x2F;&#x2F;通过[]方式取字符</li>
+<li>char&amp; at(int n);               &#x2F;&#x2F;通过at方式获取字符</li>
+</ul>
+<p><strong>Demo</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test01</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	string str = <span class="string">&quot;hello world&quot;</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; str.<span class="built_in">size</span>(); i++)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; str[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt; endl;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; str.<span class="built_in">size</span>(); i++)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; str.<span class="built_in">at</span>(i) &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt; endl;</span><br><span class="line">	<span class="comment">//字符修改</span></span><br><span class="line">	str[<span class="number">0</span>] = <span class="string">&#x27;x&#x27;</span>;</span><br><span class="line">	str.<span class="built_in">at</span>(<span class="number">1</span>) = <span class="string">&#x27;x&#x27;</span>;</span><br><span class="line">	cout &lt;&lt; str &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">test01</span>();</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">h e l l o   w o r l d</span><br><span class="line">h e l l o   w o r l d</span><br><span class="line">xxllo world</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结：</strong>string字符串中单个字符串存取有两种方式，利用[ ]或at</p>
+<h1 id="字符串插入和删除"><a href="#字符串插入和删除" class="headerlink" title="字符串插入和删除"></a>字符串插入和删除</h1><h2 id="string插入和删除"><a href="#string插入和删除" class="headerlink" title="string插入和删除"></a>string插入和删除</h2><p><strong>功能描述：</strong></p>
+<ul>
+<li>对string字符串进行插入和删除字符操作</li>
+</ul>
+<p><strong>函数原型：</strong></p>
+<ul>
+<li>string&amp; insert(int pos,const char* s);       &#x2F;&#x2F;插入字符串</li>
+<li>string&amp; insert(int pos,const string&amp; str); &#x2F;&#x2F;插入字符串</li>
+<li>string&amp; insert(int pos,int n,char c);           &#x2F;&#x2F;在指定位置插入n个字符c</li>
+<li>string&amp; erase(int pos,int n&#x3D;npos);            &#x2F;&#x2F;删除从Pos开始的n个字符</li>
+</ul>
+<p><strong>Demo</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="comment">//字符串插入和删除</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test01</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	string str = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">	str.<span class="built_in">insert</span>(<span class="number">1</span>, <span class="string">&quot;111&quot;</span>);</span><br><span class="line">	cout &lt;&lt; str &lt;&lt; endl;</span><br><span class="line">	str.<span class="built_in">erase</span>(<span class="number">1</span>, <span class="number">3</span>);<span class="comment">//从1号位置开始3个字符</span></span><br><span class="line">	cout &lt;&lt; str &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">test01</span>();</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">h111ello</span><br><span class="line">hello</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结：</strong>插入和删除的起始下标都是从0开始</p>
+<h1 id="子串获取"><a href="#子串获取" class="headerlink" title="子串获取"></a>子串获取</h1><h2 id="string子串获取"><a href="#string子串获取" class="headerlink" title="string子串获取"></a>string子串获取</h2><p><strong>功能描述：</strong></p>
+<ul>
+<li>从字符串中获取想要的子串</li>
+</ul>
+<p><strong>函数原型：</strong></p>
+<ul>
+<li>string substr(int pos &#x3D; 0, int n &#x3D; npos) const; &#x2F;&#x2F;返回由pos开始的n个字符</li>
+</ul>
+<p><strong>Demo</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="comment">//子串</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test01</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	string str = <span class="string">&quot;abcdefg&quot;</span>;</span><br><span class="line">	string substr = str.<span class="built_in">substr</span>(<span class="number">1</span>, <span class="number">3</span>);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;substr = &quot;</span> &lt;&lt; substr &lt;&lt; endl;</span><br><span class="line">	string email = <span class="string">&quot;hello@sina.com&quot;</span>;</span><br><span class="line">	<span class="type">int</span> pos = email.<span class="built_in">find</span>(<span class="string">&quot;@&quot;</span>);</span><br><span class="line">	string username = email.<span class="built_in">substr</span>(<span class="number">0</span>, pos);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;username: &quot;</span> &lt;&lt; username &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">test01</span>();</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong></p>
+<p><strong>总结：</strong>灵活的运用求子串功能，可以在实际开发中获取有效的信息</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Miyabi</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/09/14/C/C-2/">http://example.com/2025/09/14/C/C-2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Hexo</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2025/09/14/C/C-1/" title="C 1 STL初识"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">C 1 STL初识</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Miyabi</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">83</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="toc-number">1.</span> <span class="toc-text">构造函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.</span> <span class="toc-text">string基本概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="toc-number">1.2.</span> <span class="toc-text">string构造函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B5%8B%E5%80%BC%E6%93%8D%E4%BD%9C"><span class="toc-number">2.</span> <span class="toc-text">赋值操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E8%B5%8B%E5%80%BC%E6%93%8D%E4%BD%9C"><span class="toc-number">2.1.</span> <span class="toc-text">string赋值操作</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8B%BC%E6%8E%A5"><span class="toc-number">3.</span> <span class="toc-text">字符串拼接</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8B%BC%E6%8E%A5"><span class="toc-number">3.1.</span> <span class="toc-text">string字符串拼接</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9F%A5%E6%89%BE%E5%92%8C%E6%9B%BF%E6%8D%A2"><span class="toc-number">4.</span> <span class="toc-text">字符串查找和替换</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#String%E6%9F%A5%E6%89%BE%E5%92%8C%E6%9B%BF%E6%8D%A2"><span class="toc-number">4.1.</span> <span class="toc-text">String查找和替换</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%AF%94%E8%BE%83"><span class="toc-number">5.</span> <span class="toc-text">字符串比较</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%AF%94%E8%BE%83"><span class="toc-number">5.1.</span> <span class="toc-text">string字符串比较</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E5%AD%98%E5%8F%96"><span class="toc-number">6.</span> <span class="toc-text">字符存取</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E5%AD%97%E7%AC%A6%E5%AD%98%E5%8F%96"><span class="toc-number">6.1.</span> <span class="toc-text">string字符存取</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8F%92%E5%85%A5%E5%92%8C%E5%88%A0%E9%99%A4"><span class="toc-number">7.</span> <span class="toc-text">字符串插入和删除</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E6%8F%92%E5%85%A5%E5%92%8C%E5%88%A0%E9%99%A4"><span class="toc-number">7.1.</span> <span class="toc-text">string插入和删除</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%90%E4%B8%B2%E8%8E%B7%E5%8F%96"><span class="toc-number">8.</span> <span class="toc-text">子串获取</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E5%AD%90%E4%B8%B2%E8%8E%B7%E5%8F%96"><span class="toc-number">8.1.</span> <span class="toc-text">string子串获取</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/09/14/C/C-2/" title="C 2 string容器">C 2 string容器</a><time datetime="2025-09-14T15:27:12.000Z" title="发表于 2025-09-14 23:27:12">2025-09-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/09/14/C/C-1/" title="C 1 STL初识">C 1 STL初识</a><time datetime="2025-09-14T13:31:59.000Z" title="发表于 2025-09-14 21:31:59">2025-09-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/09/09/Python/Python-12/" title="Python 12 面向对象">Python 12 面向对象</a><time datetime="2025-09-09T14:26:40.000Z" title="发表于 2025-09-09 22:26:40">2025-09-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/09/01/Python/Python-11/" title="Python 11 Python基础综合案例-动态柱状图">Python 11 Python基础综合案例-动态柱状图</a><time datetime="2025-09-01T14:08:16.000Z" title="发表于 2025-09-01 22:08:16">2025-09-01</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/21/Python/Python-10/" title="Python 10 Python基础综合案例-地图可视化">Python 10 Python基础综合案例-地图可视化</a><time datetime="2025-08-21T12:53:24.000Z" title="发表于 2025-08-21 20:53:24">2025-08-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By Miyabi</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.14.0-b3"></script><script src="/js/main.js?v=4.14.0-b3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = (ele) => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from(ele).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+    
+    codeMermaidEle.forEach(ele => {
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.innerHTML = `<pre class="mermaid-src" hidden>${ele.textContent}</pre>`
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js').then(runMermaidFn)
+  }
+  
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
